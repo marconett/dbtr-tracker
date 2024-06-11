@@ -26,6 +26,4 @@ __pycache__
 # Application specific files
 venv/
 .env
-
-game_files/*
-!game_files/.gitkeep
+game_files/

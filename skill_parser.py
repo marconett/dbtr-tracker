@@ -34,8 +34,8 @@ def create_asset_json(src_dir, dst_dir):
     with open('./' + str(dst_dir) + '/skills.json', 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-    with open('./' + str(dst_dir) + '/skills.min.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False)
+    # with open('./' + str(dst_dir) + '/skills.min.json', 'w', encoding='utf-8') as f:
+    #     json.dump(data, f, ensure_ascii=False)
 
     # for a in data:
     #     pp.pprint(a['asset_name'])
