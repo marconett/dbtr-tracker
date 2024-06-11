@@ -1,0 +1,15 @@
+--- cdn.py	2024-06-11 21:08:05
++++ venv/lib/python3.11/site-packages/steam/client/cdn.py	2024-06-11 21:08:09
+@@ -835,6 +835,12 @@
+                     manifest_gid = depot_info.get('manifests', {}).get('public')
+             else:
+                 manifest_gid = depot_info.get('manifests', {}).get(branch)
++
++            if isinstance(manifest_gid, dict):
++                # For some depots, Steam has started returning a dict
++                # {"public": {"gid": GID, "size": ..., "download": ...}, ...}
++                # instead of a simple map {"public": GID, ...}
++                manifest_gid = manifest_gid['gid']
+ 
+             if manifest_gid is not None:
+                 tasks.append(
