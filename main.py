@@ -170,6 +170,11 @@ process = subprocess.Popen(command, shell=True)
 process.wait()
 
 ###
+### diabotical.exe strings
+###
+subprocess.run(f'strings -n 5 "{OUT_PATH}game/diabotical.exe" > "{OUT_PATH}diabotical.exe.strings"', shell=True, check=True)
+
+###
 ### Git repot stuff
 ###
 subprocess.run("git add .", shell=True, check=True, cwd=OUT_PATH)
