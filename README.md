@@ -30,13 +30,13 @@ git init
 git config commit.gpgsign false
 git symbolic-ref HEAD refs/heads/main
 git remote add origin git@github.com:marconett/diabotical-rogue-release-tracker.git # need write access
-git commit -m 'init'
 git add .gitignore README.md
+git commit -m 'init'
 git push --set-upstream origin main
 ```
 
 Others things to do:
 - Setup `.env` with a steam account that owns the game and has no authenticator connected
-- Setup a cron job that runs `main.py` hourly
-- Setup ssh keys so that the push works without the user present
-- The game is around 9 GB, so the server that runs this will need at least that amount of space
+- Setup a cron job that runs `run.sh` hourly
+- Setup write access ssh keys for the release-tracker repo
+- The game is around 9 GB, so the server running this will need at least that amount of space
