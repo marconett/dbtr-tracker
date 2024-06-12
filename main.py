@@ -30,9 +30,10 @@ LOGON_DETAILS = {
 }
 
 APP_ID = 2805060
+DEPOT_ID = 2805061
 OUT_PATH = "./game_files/"
 BYTE_SIZE = 2048
-LOCKFILE = '/tmp/dbtr-tracker.lock'
+LOCKFILE = "/tmp/dbtr-tracker.lock"
 
 ###
 ### Create lock
@@ -75,16 +76,16 @@ def steam_login():
 ###
 ### Check for new Manifest
 ###
-def check_manifest(client, manifest_id=0):
+def check_manifest(client, manifest_gid=0):
+  cdn_client = CDNClient(client)
 
-  # if manifest_id == 0:
-  #   # get latest
-  # else:
-  #   get manifest_id
+  if manifest_gid == 0:
+    current_manifest = cdn_client.get_manifests(APP_ID)[0]
+  else:
+    mrc = cdn_client.get_manifest_request_code(app_id=APP_ID, depot_id=DEPOT_ID, manifest_gid=manifest_gid)
+    current_manifest = cdn_client.get_manifest(app_id=APP_ID, depot_id=DEPOT_ID, manifest_gid=manifest_gid, manifest_request_code=mrc)
 
-  cdnClient = CDNClient(client)
-  latest_manifest = cdnClient.get_manifests(APP_ID)[0]
-  time_obj = datetime.datetime.fromtimestamp(latest_manifest.creation_time)
+  time_obj = datetime.datetime.fromtimestamp(current_manifest.creation_time)
   time_string = time_obj.strftime('%Y-%m-%d %H:%M:%S') + " GMT+1"
   manifest_file = OUT_PATH + '/manifests.json'
 
@@ -95,15 +96,15 @@ def check_manifest(client, manifest_id=0):
   with open(manifest_file, 'r+', encoding='utf-8') as f:
     manifest_db = json.load(f)
 
-    if (len(manifest_db) > 0 and manifest_db[0]['manifest_gid'] == latest_manifest.gid):
+    if (len(manifest_db) > 0 and manifest_db[0]['manifest_gid'] == current_manifest.gid):
       print('no new manifest found')
       release_lock()
       exit()
 
     new_item = {
-      'app_id': latest_manifest.app_id,
-      'depot_id': latest_manifest.depot_id,
-      'manifest_gid': latest_manifest.gid,
+      'app_id': current_manifest.app_id,
+      'depot_id': current_manifest.depot_id,
+      'manifest_gid': current_manifest.gid,
       'creation_time': time_string
     }
 
@@ -111,7 +112,7 @@ def check_manifest(client, manifest_id=0):
     json.dump([new_item] + manifest_db, f, ensure_ascii=False, indent=4)
     f.truncate()
 
-  return latest_manifest
+  return current_manifest
 
 ###
 ### Write list of files
@@ -210,13 +211,54 @@ def release_lock():
 ###
 ### Git repo stuff
 ###
-def push_to_git(manifest):
+def handle_git(manifest, do_push=True):
   subprocess.run("git add .", shell=True, check=True, cwd=OUT_PATH)
   subprocess.run(f"git commit -m '{str(manifest.gid)}'", shell=True, check=True, cwd=OUT_PATH)
-  subprocess.run("git push --set-upstream origin main", shell=True, check=True, cwd=OUT_PATH)
+
+  if do_push:
+    subprocess.run("git push --set-upstream origin main", shell=True, check=True, cwd=OUT_PATH)
+
+def history_mode():
+  # manually copied from https://steamdb.info/depot/2805061/manifests/
+  all_manifests = [
+    7113671684167122265,
+    7077270277889959405,
+    3449321466558553928,
+    5742813652420791405,
+    662351083375035783,
+    9149542590703531575,
+    3619381231507744385,
+    3277643727936153714,
+    16527666219191239,
+    2819424903252991090,
+    5592165992911662261,
+    3689972292780807126,
+    435796013158898989,
+    7009853537201240047,
+    2488034945469343448,
+    3046919136082386368,
+  ]
+
+  steam_client = steam_login()
+
+  # loop from oldest to newest
+  for manifest_gid in reversed(all_manifests):
+    manifest = check_manifest(steam_client, manifest_gid)
+    write_file_list(manifest)
+    download_game(manifest)
+
+    write_dbp_lists()
+    unpack_assets()
+    unpack_ui()
+    parse_skills_and_weapons()
+    get_binary_strings()
+
+    handle_git(manifest, do_push=False)
+
+  steam_client.logout()
 
 
-if __name__ == "__main__":
+def cron_mode():
   create_lock()
   steam_client = steam_login()
 
@@ -233,4 +275,8 @@ if __name__ == "__main__":
   get_binary_strings()
 
   release_lock()
-  push_to_git(manifest)
+  handle_git(manifest)
+
+if __name__ == "__main__":
+  cron_mode()
+  # history_mode()
