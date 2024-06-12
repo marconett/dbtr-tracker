@@ -184,6 +184,9 @@ def parse_skills_and_weapons():
 ### Unpack UI
 ###
 def unpack_ui():
+  shutil.rmtree(OUT_PATH + "ui/", ignore_errors=True)
+  shutil.rmtree(OUT_PATH + "start/", ignore_errors=True)
+
   if platform == "linux":
       command = "./uiexporter-linux"
   elif platform == "darwin":
