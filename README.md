@@ -17,7 +17,7 @@ The steam pypi package needs a patch, see https://github.com/ValvePython/steam/p
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-patch venv/lib/python3.11/site-packages/steam/client/cdn.py < patches/cdn_client.patch
+patch venv/lib/python3.*/site-packages/steam/client/cdn.py < patches/cdn_client.patch
 
 cp .env.example .env
 

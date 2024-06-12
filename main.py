@@ -68,7 +68,13 @@ time_string = time_obj.strftime('%Y-%m-%d %H:%M:%S') + " GMT+1"
 ###
 ### Check for new Manifest
 ###
-with open(OUT_PATH + '/manifests.json', 'r+', encoding='utf-8') as f:
+manfest_file = OUT_PATH + '/manifests.json'
+
+if not os.path.isfile(manfest_file):
+  with open(manfest_file) as f:
+    f.write('[]')
+
+with open(manfest_file, 'r+', encoding='utf-8') as f:
   manifest_db = json.load(f)
 
   if (manifest_db[0]['manifest_gid'] == latest_manifest.gid):
