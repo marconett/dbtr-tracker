@@ -131,12 +131,16 @@ def download_game(manifest):
   os.mkdir(OUT_PATH + "game/")
 
   for game_file in list(manifest.iter_files()):
-    if game_file.seekable:
-      os.makedirs(OUT_PATH + "game/" + os.path.dirname(game_file.filename), exist_ok=True)
-      with open(OUT_PATH + "game/" + game_file.filename, 'wb') as f:
-        for i in range(int((game_file.size - (game_file.size % BYTE_SIZE)) / BYTE_SIZE)):
-          f.write(game_file.read(BYTE_SIZE))
-        f.write(game_file.read((game_file.size % BYTE_SIZE)))
+    try:
+      if game_file.seekable:
+        os.makedirs(OUT_PATH + "game/" + os.path.dirname(game_file.filename), exist_ok=True)
+        with open(OUT_PATH + "game/" + game_file.filename, 'wb') as f:
+          for i in range(int((game_file.size - (game_file.size % BYTE_SIZE)) / BYTE_SIZE)):
+            f.write(game_file.read(BYTE_SIZE))
+          f.write(game_file.read((game_file.size % BYTE_SIZE)))
+    except Exception as e:
+        print(f"An error occurred while processing {game_file.filename}: {e}")
+        continue
 
 ###
 ### Log the content of .dbp files
