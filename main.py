@@ -32,6 +32,17 @@ LOGON_DETAILS = {
 APP_ID = 2805060
 OUT_PATH = "./game_files/"
 BYTE_SIZE = 2048
+LOCKFILE = '/tmp/dbtr-tracker.lock'
+
+###
+### Create lock
+###
+if os.path.exists(LOCKFILE):
+  print("Another instance is already running.")
+  exit(1)
+else:
+  with open(LOCKFILE, 'w') as lockfile:
+    lockfile.write(str(os.getpid()))
 
 ###
 ### Steam login
@@ -175,8 +186,14 @@ process.wait()
 subprocess.run(f'strings -n 5 "{OUT_PATH}game/diabotical.exe" > "{OUT_PATH}diabotical.exe.strings"', shell=True, check=True)
 
 ###
-### Git repot stuff
+### Release lock
+###
+if os.path.exists(LOCKFILE):
+  os.remove(LOCKFILE)
+
+###
+### Git repo stuff
 ###
 subprocess.run("git add .", shell=True, check=True, cwd=OUT_PATH)
 subprocess.run(f"git commit -m '{str(latest_manifest.gid)}'", shell=True, check=True, cwd=OUT_PATH)
-subprocess.run("git push", shell=True, check=True, cwd=OUT_PATH)
+subprocess.run("git push --set-upstream origin main", shell=True, check=True, cwd=OUT_PATH)

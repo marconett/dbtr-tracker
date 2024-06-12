@@ -24,7 +24,13 @@ __pycache__
 .Trashes
 
 # Application specific files
-venv/
-.env
-game_files/
-update.log
+game/
+*.exe
+*.rbr
+*.rbe
+*.dbp
+*.dds
+*.fbx
+*.dbm
+*.png
+/.gitkeep

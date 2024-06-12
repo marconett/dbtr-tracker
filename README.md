@@ -1,7 +1,7 @@
 # Diabotical Rogue Tracker
 
 This tools is supposed to run at least hourly as a cron job. It checks if the game was updated and if so, downloads it and collects text content and (meta) data included in the game.
-Those files are added to a repo here <INSERT_REPO_LINK> and every time the game gets updated, a new commit is created, making it possible to track changes to the game.
+Those files are added to a repo here https://github.com/marconett/diabotical-rogue-release-tracker and every time the game gets updated, a new commit is created, making it possible to track changes to the game.
 
 It's like the following repo, but for Diabotical Rogue and using Steam instead of EGS: https://github.com/derrod/dbtracker
 
@@ -22,9 +22,16 @@ patch venv/lib/python3.*/site-packages/steam/client/cdn.py < patches/cdn_client.
 cp .env.example .env
 
 mkdir game_files
+cp game_files.gitignore game_files/.gitignore
+cp README_release-tracker.md game_files/README.md
+
 cd game_files
-git init .
-git remote add ... # add a remote
+git init
+git config commit.gpgsign false
+git symbolic-ref HEAD refs/heads/main
+git remote add origin git@github.com:marconett/diabotical-rogue-release-tracker.git # need write access
+git fetch
+git branch --set-upstream-to=origin/main
 ```
 
 Others things to do:
