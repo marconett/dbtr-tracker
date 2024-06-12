@@ -68,16 +68,16 @@ time_string = time_obj.strftime('%Y-%m-%d %H:%M:%S') + " GMT+1"
 ###
 ### Check for new Manifest
 ###
-manfest_file = OUT_PATH + '/manifests.json'
+manifest_file = OUT_PATH + '/manifests.json'
 
-if not os.path.isfile(manfest_file):
-  with open(manfest_file) as f:
+if not os.path.isfile(manifest_file):
+  with open(manifest_file, 'w') as f:
     f.write('[]')
 
-with open(manfest_file, 'r+', encoding='utf-8') as f:
+with open(manifest_file, 'r+', encoding='utf-8') as f:
   manifest_db = json.load(f)
 
-  if (manifest_db[0]['manifest_gid'] == latest_manifest.gid):
+  if (len(manifest_db) > 0 and manifest_db[0]['manifest_gid'] == latest_manifest.gid):
     print('no new manifest found')
     exit()
 
@@ -103,7 +103,7 @@ with open(OUT_PATH + "/files.txt", "w", encoding="utf-8") as f:
 ###
 ### Download the game
 ###
-shutil.rmtree(OUT_PATH + "game/")
+shutil.rmtree(OUT_PATH + "game/", ignore_errors=True)
 os.mkdir(OUT_PATH + "game/")
 
 for game_file in list(latest_manifest.iter_files()):
