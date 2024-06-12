@@ -30,8 +30,9 @@ git init
 git config commit.gpgsign false
 git symbolic-ref HEAD refs/heads/main
 git remote add origin git@github.com:marconett/diabotical-rogue-release-tracker.git # need write access
-git fetch
-git branch --set-upstream-to=origin/main
+git commit -m 'init'
+git add .gitignore README.md
+git push --set-upstream origin main
 ```
 
 Others things to do:
