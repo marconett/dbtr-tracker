@@ -76,7 +76,7 @@ def steam_login():
 ###
 ### Check for new Manifest
 ###
-def check_manifest(client, manifest_gid=0):
+def check_manifest(client, manifest_gid=0, duplicate_test=True):
   cdn_client = CDNClient(client)
 
   if manifest_gid == 0:
@@ -96,7 +96,7 @@ def check_manifest(client, manifest_gid=0):
   with open(manifest_file, 'r+', encoding='utf-8') as f:
     manifest_db = json.load(f)
 
-    if (len(manifest_db) > 0 and manifest_db[0]['manifest_gid'] == current_manifest.gid):
+    if (duplicate_test == True and len(manifest_db) > 0 and manifest_db[0]['manifest_gid'] == current_manifest.gid):
       print('no new manifest found')
       release_lock()
       exit()
@@ -119,9 +119,12 @@ def check_manifest(client, manifest_gid=0):
 ###
 def write_file_list(manifest):
   with open(OUT_PATH + "/files.txt", "w", encoding="utf-8") as f:
-    for game_file in list(manifest.iter_files()):
+    files = list(manifest.iter_files())
+    sorted_files = sorted(files, key=lambda game_file: game_file.filename)
+    for game_file in sorted_files:
       sha1 = game_file.file_mapping.sha_content.hex()
       f.write(sha1 + "\t" + game_file.filename + "\t" + str(game_file.size) + "\n")
+
 
 ###
 ### Download the game
@@ -223,24 +226,9 @@ def handle_git(manifest, do_push=True):
     subprocess.run("git push --set-upstream origin main", shell=True, check=True, cwd=OUT_PATH)
 
 def history_mode():
-  # manually copied from https://steamdb.info/depot/2805061/manifests/
+  # see https://steamdb.info/depot/2805061/manifests/
   all_manifests = [
-    7113671684167122265,
-    7077270277889959405,
-    3449321466558553928,
-    5742813652420791405,
-    662351083375035783,
-    9149542590703531575,
-    3619381231507744385,
-    3277643727936153714,
-    16527666219191239,
-    2819424903252991090,
-    5592165992911662261,
-    3689972292780807126,
-    435796013158898989,
-    7009853537201240047,
-    2488034945469343448,
-    3046919136082386368,
+    # put manifest ids of past releases
   ]
 
   steam_client = steam_login()
