@@ -10,6 +10,7 @@ import os
 import io
 import subprocess
 import shutil
+import hashlib
 
 from sys import platform
 from steam.client import SteamClient
@@ -127,20 +128,50 @@ def write_file_list(manifest):
 
 
 ###
+### Chunked sha1 hashing
+###
+def get_sha1_hash(file_path):
+  BUF_SIZE = 65536
+  sha1 = hashlib.sha1()
+
+  with open(file_path, 'rb') as f:
+    while True:
+      data = f.read(BUF_SIZE)
+      if not data:
+        break
+      sha1.update(data)
+
+  return sha1.hexdigest()
+
+###
+### Download a file to given path
+###
+def download_file(game_file, full_file_path):
+  os.makedirs(os.path.dirname(full_file_path), exist_ok=True)
+
+  if os.path.isfile(full_file_path):
+    os.remove(full_file_path)
+
+  with open(full_file_path, 'wb') as f:
+    for i in range(int((game_file.size - (game_file.size % BYTE_SIZE)) / BYTE_SIZE)):
+      f.write(game_file.read(BYTE_SIZE))
+    f.write(game_file.read((game_file.size % BYTE_SIZE)))
+
+###
 ### Download the game
 ###
-def download_game(manifest):
-  shutil.rmtree(OUT_PATH + "game/", ignore_errors=True)
-  os.mkdir(OUT_PATH + "game/")
-
+def download_game(manifest, dry_run=False):
   for game_file in list(manifest.iter_files()):
     try:
       if game_file.seekable:
-        os.makedirs(OUT_PATH + "game/" + os.path.dirname(game_file.filename), exist_ok=True)
-        with open(OUT_PATH + "game/" + game_file.filename, 'wb') as f:
-          for i in range(int((game_file.size - (game_file.size % BYTE_SIZE)) / BYTE_SIZE)):
-            f.write(game_file.read(BYTE_SIZE))
-          f.write(game_file.read((game_file.size % BYTE_SIZE)))
+        full_file_path = OUT_PATH + "game/" + game_file.filename
+        new_sha1 = game_file.file_mapping.sha_content.hex()
+
+        if ((not os.path.isfile(full_file_path)) or (get_sha1_hash(full_file_path) != new_sha1)):
+          print(f"Downloading new or changed file: {game_file.filename}")
+          if not dry_run: download_file(game_file, full_file_path)
+        # else:
+        #   print(f"Not downloading unchanged file: {game_file.filename}")
     except Exception as e:
         print(f"An error occurred while processing {game_file.filename}: {e}")
         continue
@@ -225,6 +256,7 @@ def handle_git(manifest, do_push=True):
   if do_push:
     subprocess.run("git push --set-upstream origin main", shell=True, check=True, cwd=OUT_PATH)
 
+
 def history_mode():
   # see https://steamdb.info/depot/2805061/manifests/
   all_manifests = [
@@ -248,7 +280,6 @@ def history_mode():
     handle_git(manifest, do_push=False)
 
   steam_client.logout()
-
 
 def cron_mode():
   create_lock()
