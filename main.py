@@ -241,13 +241,13 @@ def collect_ui_folder():
     os.makedirs(dst, exist_ok=True)
 
     for item in os.listdir(src):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            copy_folder(s, d, exclude_extensions)
-        else:
-            if not any(s.endswith(ext) for ext in exclude_extensions):
-                shutil.copy2(s, d)
+      s = os.path.join(src, item)
+      d = os.path.join(dst, item)
+      if os.path.isdir(s):
+        copy_folder(s, d, exclude_extensions)
+      else:
+        if not any(s.endswith(ext) for ext in exclude_extensions):
+          shutil.copy2(s, d)
 
   src = OUT_PATH + "game/ui/"
   dst = OUT_PATH + "game-ui/"

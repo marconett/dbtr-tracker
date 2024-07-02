@@ -8,3 +8,5 @@ if [ -z "$SSH_AUTH_SOCK" ] ; then
 fi
 
 python3 main.py
+
+kill $SSH_AGENT_PID
