@@ -23,15 +23,30 @@ WEAPONS = [
   'rogue_submachinegun',
   'rogue_supershotgun',
   'rogue_revolver',
+  'rogue_grenadelauncher',
+
+  # secondaries
+  'rogue_revolver_secondary',
+  'rogue_voidcannon_secondary',
+  'rogue_rocketlauncher_secondary',
+  'rogue_blaster_secondary',
+
+  # referenced but not in the game yet
+  'rogue_voidcannon',
+  'rogue_hammerswing',
+  'rogue_left_hand',
+  'rogue_doublebarreled_shotgun',
+  'rogue_bow',
+  'rogue_pistol',
+  'rogue_pncr',
+  'rogue_sword',
+  'rogue_tommygun',
   'arena_left_hand',
   'fists',
-  'rogue_sword',
 ]
 
-DENYLIST = [
-  'arena_left_hand',
-  'fists',
-]
+# DENYLIST = [
+# ]
 
 class bcolors:
     HEADER = '\033[95m'
