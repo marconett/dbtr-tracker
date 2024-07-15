@@ -30,6 +30,7 @@ WEAPONS = [
   'rogue_voidcannon_secondary',
   'rogue_rocketlauncher_secondary',
   'rogue_blaster_secondary',
+  'rogue_grenadelauncher_secondary',
 
   # referenced but not in the game yet
   'rogue_voidcannon',
@@ -71,8 +72,8 @@ def create_asset_json(src_dir, dst_dir):
     # can't do keyed objects because there are 60 duplicate asset_names :(
 
     for file in glob.iglob('./' + str(src_dir) + '/**/*.weapon', recursive=True):
-        data = data + parse_assets(file);
-        # data.update(parse_assets(file));
+        data = data + parse_assets(file)
+        # data.update(parse_assets(file))
 
     # data = [d for d in data if d.get('weapon_id') not in DENYLIST]
 
