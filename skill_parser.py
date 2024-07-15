@@ -28,8 +28,11 @@ def create_asset_json(src_dir, dst_dir):
     # can't do keyed objects because there are 60 duplicate asset_names :(
 
     for file in glob.iglob('./' + str(src_dir) + '/**/*.skills', recursive=True):
-        data = data + parse_assets(file);
-        # data.update(parse_assets(file));
+        if file.endswith("bigbot.skills"):
+            continue
+
+        data = data + parse_assets(file)
+        # data.update(parse_assets(file))
 
     with open('./' + str(dst_dir) + '/skills.json', 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
